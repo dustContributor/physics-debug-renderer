@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Debug Renderer</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./static/deps/three.module.js"
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/static/index.css">
+</head>
+
+<body>
+  <div id="app-settings" class="app-settings">
+    <div>
+      <label>Polling Interval</label>
+      <input id="app-polling-interval" name="polling-interval" type="number">
+    </div>
+    <div>
+      <label>Port</label>
+      <input id="app-port" name="port" type="number">
+    </div>
+    <div>
+      <button id="app-start-polling" name="start-polling" class="ts-lv2">START</button>
+      <button id="app-stop-polling" name="stop-polling" class="ts-lv2 app-hide">STOP</button>
+      <label id="app-polling-status" name="polling-status">DISCONNECTED</label>
+    </div>
+  </div>
+  <div id="app-window"></div>
+</body>
+<footer>
+  <script type="module">
+    import { App } from './static/app.js'
+    import './static/index.js'
+    App.views.index.render({
+      settingsId: 'app-settings',
+      windowId: 'app-window',
+      polling: {
+        intervalId: 'app-polling-interval',
+        portId: 'app-port',
+        startId: 'app-start-polling',
+        stopId: 'app-stop-polling',
+        statusId: 'app-polling-status'
+      }
+    });
+  </script>
+</footer>
+
+</html>
