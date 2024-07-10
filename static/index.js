@@ -116,15 +116,11 @@ App.views.define(() => {
     $els.polling.port.value = 10001
 
     const debugScene = new DebugScene($els.window, materialFor)
-
-    /** @type {Object.<number, PrimitiveDiff>} */
-    const diffsById = enums.primitives.slice(1).reduce((m, v) => {
-      m[v.id] = new PrimitiveDiff(v, geometriesByType[v.id])
-      return m
-    }, {})
-
-    /** @type {PrimitiveDiff[]} */
-    const diffs = Object.values(diffsById) /*  */
+    const makeDiffsById = () =>
+      enums.primitives.slice(1).reduce((m, v) => {
+        m[v.id] = new PrimitiveDiff(v, geometriesByType[v.id])
+        return m
+      }, {})
 
     const polling = (socket) => {
       const poll = _.throttle(() => {
@@ -139,38 +135,46 @@ App.views.define(() => {
     const elmHide = (e) => e.classList.add('app-hide')
     const elmShow = (e) => e.classList.remove('app-hide')
 
-    const socketMessage = (_) => async (e) => {
+    const socketMessage = ({ diffsById }) => async (e) => {
       const arrayBuffer = await e.data.arrayBuffer()
       const buffer = new DataView(arrayBuffer)
+      let processedCount = 0
       for (let offset = 0; offset < buffer.byteLength;) {
         const primitiveId = buffer.getInt32(offset)
         const diff = diffsById[primitiveId]
         if (!diff) {
           throw new Error(`primitive id ${primitiveId} is invalid!`)
         }
-        offset = diff.decode(buffer, offset)
+        const res = diff.decode(buffer, offset)
+        offset = res.offset
+        processedCount += res.processed
       }
+      const diffs = Object.values(diffsById)
+      for (const diff of diffs) {
+        diff.processRemoved()
+      }
+
       let removedCount = 0
       let addedCount = 0
-      const results = diffs.map((v) => v.content())
-      for (const result of results) {
-        for (const removed of result.removed) {
-          debugScene.remove(removed)
+      for (const diff of diffs) {
+        for (const r of diff.content().removed) {
+          debugScene.remove(r)
           removedCount++
         }
       }
-      for (const result of results) {
-        for (const added of result.added) {
-          debugScene.add(added)
+      for (const diff of diffs) {
+        for (const a of diff.content().added) {
+          debugScene.add(a)
           addedCount++
         }
       }
       for (const diff of diffs) {
-        diff.reset()
+        diff.prepare()
       }
-
       $els.status.removed.value = removedCount
       $els.status.added.value = addedCount
+      $els.status.processed.value = processedCount
+      $els.status.current.value = debugScene.itemsInScene()
       let frameCount = Number.parseInt($els.status.frame.value ?? 0) + 1
       if (frameCount > 999999) {
         frameCount = 0
@@ -199,7 +203,6 @@ App.views.define(() => {
     const socketClose = (_) => () => {
       $els.polling.status.innerText = 'DISCONNECTED'
       debugScene.reset()
-      diffs.forEach((d) => d.clear())
       Object.values($els.status).forEach((e) => e.value = 0)
     }
 
@@ -211,10 +214,12 @@ App.views.define(() => {
 
     $els.polling.start.addEventListener('click', () => {
       const socket = new WebSocket(`ws://localhost:${$els.polling.port.value}`)
+      /** @type {Object.<number, PrimitiveDiff>} */
+      const diffsById = makeDiffsById()
       socket.onopen = socketOpen(socket)
-      socket.onclose = socketClose(socket)
+      socket.onclose = socketClose({ diffsById })
       socket.onerror = socketError(socket)
-      socket.onmessage = socketMessage(socket)
+      socket.onmessage = socketMessage({ diffsById })
       return socket
     })
   }

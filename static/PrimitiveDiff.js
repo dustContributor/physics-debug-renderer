@@ -47,10 +47,10 @@ const primitives = [{
 }].map((p) => {
     // elements are 32bit floats or ints
     p.elmSize = 4
-    // message header is two ints, id and material
+    // message header is two ints: id and material
     p.headerSize = p.elmSize * 2
     // elements plus type id plus material
-    p.elements = (p.elements + 2) * Math.min(1, p.elements)
+    p.elements = p.elements > 0 ? p.elements + 2 : 0
     p.msgSize = p.elements * p.elmSize
     return Object.freeze(p)
 })
@@ -64,9 +64,9 @@ export class PrimitiveDiff {
     /** @type {Set.<bigint>} */
     #current = new Set()
     /** @type {Set.<bigint>} */
-    #existing = new Set()
+    #processed = new Set()
     /** @type {number[]} */
-    #item = []
+    #primitiveData = []
     /** @type {{added : number[], removed : number[]}}  */
     #diff = Object.freeze({
         added: [],
@@ -89,26 +89,35 @@ export class PrimitiveDiff {
         return this.#diff
     }
 
-    reset() {
-        this.#existing.clear()
-        this.#item.length = 0
+    prepare() {
+        this.#processed.clear()
+        this.#primitiveData.length = 0
         this.#diff.added.length = 0
         this.#diff.removed.length = 0
     }
 
-    clear() {
-        this.reset()
-        this.#current.clear()
+    processRemoved() {
+        // Collect all the remvoed primitives
+        for (const c of this.#current) {
+            if (!this.#processed.has(c)) {
+                this.#diff.removed.push(c)
+            }
+        }
+        // Remove them from the current primitives
+        for (const r of this.#diff.removed) {
+            this.#current.delete(r)
+        }
     }
 
     /**
      * @param {DataView} buffer
      * @param {number} start
-     * @returns {number}
+     * @returns {{processed: number, offset: number}}
      */
     decode(buffer, start) {
-        const { id, msgSize, elmSize } = this.#primitive
-        const { added, removed } = this.#diff
+        const { id, msgSize, elmSize, headerSize } = this.#primitive
+        const added = this.#diff.added
+        let processed = 0
         let offset = start
         for (; offset < buffer.byteLength; offset += msgSize) {
             const primitiveId = buffer.getInt32(offset)
@@ -116,32 +125,31 @@ export class PrimitiveDiff {
                 // Stopped decoding the contiguous primitive sequence.
                 break
             }
-            this.#item.length = 0
-            // Skip over the first two elements, id and material.
-            for (let e = elmSize * 2; e < msgSize; e += elmSize) {
-                this.#item.push(buffer.getFloat32(offset + e))
-            }
+            // Add a primitive to the processed counter
+            processed++
             const key = hash.buffer(buffer, offset, offset + msgSize)
-            if (!this.#current.has(key) && !this.#existing.has(key)) {
-                added.push(this.#geometry(key, this.#item, buffer.getInt32(offset + elmSize)))
+            if (this.#processed.has(key)) {
+                // Primitive was sent duplicated, skip decoding
+                continue
             }
-            this.#existing.add(key)
-        }
-        if (offset === start) {
-            // Didn't process anything
-            return offset
-        }
-        for (const key of this.#current) {
-            if (!this.#existing.has(key)) {
-                this.#current.delete(key)
-                removed.push(key)
+            this.#processed.add(key)
+            if (this.#current.has(key)) {
+                // Primitive already exists in the diff, skip decoding
+                continue
             }
+            // Register primitive in the diff and decode
+            this.#current.add(key)
+            this.#primitiveData.length = 0
+            const material = buffer.getInt32(offset + elmSize)
+            // Skip over the header
+            for (let e = headerSize; e < msgSize; e += elmSize) {
+                this.#primitiveData.push(buffer.getFloat32(offset + e))
+            }
+            const geo = this.#geometry(key, this.#primitiveData, material)
+            added.push(geo)
         }
-        for (const item of added) {
-            this.#current.add(item.name)
-        }
-        // Return at which point we stopped processing.
-        return offset
+        // Return offset that got advanced and processed primitives counter
+        return { offset, processed }
     }
 
     constructor(

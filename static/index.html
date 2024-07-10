@@ -22,12 +22,20 @@
         <input id="app-frame-count" name="frame" type="number" readonly="true" />
       </div>
       <div>
+        <label>Processed</label>
+        <input id="app-processed-count" name="processed" type="number" readonly="true" />
+      </div>
+      <div>
         <label>Added</label>
         <input id="app-added-count" name="added" type="number" readonly="true" />
       </div>
       <div>
         <label>Removed</label>
         <input id="app-removed-count" name="removed" type="number" readonly="true" />
+      </div>
+      <div>
+        <label>Current</label>
+        <input id="app-current-count" name="current" type="number" readonly="true" />
       </div>
     </div>
     <div>
@@ -65,7 +73,9 @@
       status: {
         addedId: 'app-added-count',
         frameId: 'app-frame-count',
-        removedId: 'app-removed-count'
+        removedId: 'app-removed-count',
+        processedId: 'app-processed-count',
+        currentId: 'app-current-count',
       }
     });
   </script>

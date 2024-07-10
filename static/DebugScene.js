@@ -85,4 +85,7 @@ export class DebugScene {
             this.#scene.add(def)
         }
     }
+    itemsInScene() {
+        return this.#scene.children.length
+    }
 }
