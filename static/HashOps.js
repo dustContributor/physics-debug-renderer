@@ -31,7 +31,7 @@ export class HashOps {
             if (i + 4 > limit) {
                 break
             }
-            const v = buffer.getUint32(i)
+            const v = BigInt(buffer.getUint32(i))
             hash = BigInt.asIntN(64, (hash ^ v) * prime)
         }
         if (i === limit) {
@@ -40,7 +40,7 @@ export class HashOps {
         }
         // Hash any remaining bytes individually
         for (i = i - 4; i < limit; i++) {
-            const v = buffer.getUint8(i)
+            const v = BigInt(buffer.getUint8(i))
             hash = BigInt.asIntN(64, (hash ^ v) * prime)
         }
         return hash
