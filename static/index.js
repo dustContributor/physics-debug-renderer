@@ -201,9 +201,11 @@ App.views.define(() => {
     }
 
     const socketClose = (_) => () => {
-      $els.polling.status.innerText = 'DISCONNECTED'
       debugScene.reset()
+      $els.polling.status.innerText = 'DISCONNECTED'
       Object.values($els.status).forEach((e) => e.value = 0)
+      elmHide($els.polling.stop)
+      elmShow($els.polling.start)
     }
 
     const socketError = (_) => () => {
