@@ -16,6 +16,12 @@ export class DebugScene {
     #defMesh
     /** @type {Function} */
     #renderFunc
+    /**
+     * Keep an internal map of the objects handled by this scene,
+     * three.js uses plain linear search to find objects inside
+     * @type {Map<bigint, THREE.Mesh>}
+     */
+    #objectsByName = new Map()
 
     constructor($elm, materialCache) {
         const { innerHeight, innerWidth } = window
@@ -60,17 +66,23 @@ export class DebugScene {
     removeDefault() {
         this.#scene.remove(this.#defMesh)
     }
-    remove(obj) {
-        const removed = this.#scene.getObjectByName(obj)
+    /**
+     * @param {bigint} key
+     */
+    remove(key) {
+        const removed = this.#objectsByName.get(key)
         if (!removed) {
-            throw new Error(`object ${obj} not found in the scene!`)
+            throw new Error(`Object with key ${key} not found in the scene!`)
         }
-        this.#scene.remove(obj)
-        removed.material.dispose()
+        this.#scene.remove(removed)
         removed.geometry.dispose()
     }
+    /**
+     * @param {THREE.Mesh} obj
+     */
     add(obj) {
         this.#scene.add(obj)
+        this.#objectsByName.set(obj.name, obj)
     }
     renderLoop() {
         this.#renderFunc()
@@ -80,6 +92,8 @@ export class DebugScene {
         while (this.#scene.children.length > 0) {
             this.#scene.remove(this.#scene.children[this.#scene.children.length - 1])
         }
+        // Clear the internal map of scene objects
+        this.#objectsByName.clear()
         // Add the default light/meshes
         for (const def of this.#defSceneItems) {
             this.#scene.add(def)

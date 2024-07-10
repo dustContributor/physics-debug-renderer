@@ -116,6 +116,7 @@ App.views.define(() => {
     $els.polling.port.value = 10001
 
     const debugScene = new DebugScene($els.window, materialFor)
+    /** @returns {Object.<string, PrimitiveDiff>} */
     const makeDiffsById = () =>
       enums.primitives.slice(1).reduce((m, v) => {
         m[v.id] = new PrimitiveDiff(v, geometriesByType[v.id])
@@ -135,7 +136,7 @@ App.views.define(() => {
     const elmHide = (e) => e.classList.add('app-hide')
     const elmShow = (e) => e.classList.remove('app-hide')
 
-    const socketMessage = ({ diffsById }) => async (e) => {
+    const socketMessage = (/** @type {Object.<string, PrimitiveDiff>} */ diffsById) => async (e) => {
       const arrayBuffer = await e.data.arrayBuffer()
       const buffer = new DataView(arrayBuffer)
       let processedCount = 0
@@ -216,12 +217,11 @@ App.views.define(() => {
 
     $els.polling.start.addEventListener('click', () => {
       const socket = new WebSocket(`ws://localhost:${$els.polling.port.value}`)
-      /** @type {Object.<number, PrimitiveDiff>} */
       const diffsById = makeDiffsById()
       socket.onopen = socketOpen(socket)
-      socket.onclose = socketClose({ diffsById })
+      socket.onclose = socketClose(socket)
       socket.onerror = socketError(socket)
-      socket.onmessage = socketMessage({ diffsById })
+      socket.onmessage = socketMessage(diffsById)
       return socket
     })
   }

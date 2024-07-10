@@ -67,7 +67,7 @@ export class PrimitiveDiff {
     #processed = new Set()
     /** @type {number[]} */
     #primitiveData = []
-    /** @type {{added : number[], removed : number[]}}  */
+    /** @type {{added : any[], removed : number[]}}  */
     #diff = Object.freeze({
         added: [],
         removed: [],
