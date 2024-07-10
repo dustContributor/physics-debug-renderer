@@ -31,35 +31,38 @@
 
 .app-settings {
   position: absolute;
-  left: 20px;
-  top: 20px;
+  left: 1em;
+  top: 1em;
   background-color: white;
+  font-size: 9pt;
+  display: flex;
+  flex-flow: row wrap;
 }
 
-.app-settings>div {
+.app-settings>div>div {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
   padding: 0.5em;
 }
 
-.app-settings>div>label {
-  min-width: 14em;
+.app-settings>div>div>label {
+  min-width: 9em;
 }
 
-.app-settings>div>label:first-child {
+.app-settings>div>div>label:first-child {
   text-align: right;
 }
 
-.app-settings>div>label:last-child {
+.app-settings>div>div>label:last-child {
   text-align: left;
 }
 
-.app-settings>div>* {
+.app-settings>div>div>* {
   flex: 1 0 auto;
 }
 
-.app-settings>div>*:last-child {
+.app-settings>div>div>*:last-child {
   margin-left: 0.5em;
 }
 
@@ -79,6 +82,7 @@
   border: none;
   border-top: lightgray 1px solid;
   border-bottom: lightgray 1px solid;
+  text-align: right;
 }
 
 .app-hide {

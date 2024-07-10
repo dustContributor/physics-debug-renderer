@@ -126,13 +126,15 @@ App.views.define(() => {
     /** @type {PrimitiveDiff[]} */
     const diffs = Object.values(diffsById) /*  */
 
-    const polling = (socket) =>
-      _.throttle(() => {
+    const polling = (socket) => {
+      const poll = _.throttle(() => {
         if (socket.readyState == WebSocket.OPEN) {
-          window.requestAnimationFrame(polling)
+          window.requestAnimationFrame(poll)
           socket.send('POLL')
         }
       }, intervalVal())
+      return poll
+    }
 
     const elmHide = (e) => e.classList.add('app-hide')
     const elmShow = (e) => e.classList.remove('app-hide')
@@ -166,6 +168,14 @@ App.views.define(() => {
       for (const diff of diffs) {
         diff.reset()
       }
+
+      $els.status.removed.value = removedCount
+      $els.status.added.value = addedCount
+      let frameCount = Number.parseInt($els.status.frame.value ?? 0) + 1
+      if (frameCount > 999999) {
+        frameCount = 0
+      }
+      $els.status.frame.value = frameCount
     }
 
     const socketOpen = (socket) => () => {
@@ -190,6 +200,7 @@ App.views.define(() => {
       $els.polling.status.innerText = 'DISCONNECTED'
       debugScene.reset()
       diffs.forEach((d) => d.clear())
+      Object.values($els.status).forEach((e) => e.value = 0)
     }
 
     const socketError = (_) => () => {

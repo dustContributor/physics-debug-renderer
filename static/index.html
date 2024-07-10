@@ -17,17 +17,33 @@
 <body>
   <div id="app-settings" class="app-settings">
     <div>
-      <label>Polling Interval</label>
-      <input id="app-polling-interval" name="polling-interval" type="number">
+      <div>
+        <label>Frame</label>
+        <input id="app-frame-count" name="frame" type="number" readonly="true" />
+      </div>
+      <div>
+        <label>Added</label>
+        <input id="app-added-count" name="added" type="number" readonly="true" />
+      </div>
+      <div>
+        <label>Removed</label>
+        <input id="app-removed-count" name="removed" type="number" readonly="true" />
+      </div>
     </div>
     <div>
-      <label>Port</label>
-      <input id="app-port" name="port" type="number">
-    </div>
-    <div>
-      <button id="app-start-polling" name="start-polling" class="ts-lv2">START</button>
-      <button id="app-stop-polling" name="stop-polling" class="ts-lv2 app-hide">STOP</button>
-      <label id="app-polling-status" name="polling-status">DISCONNECTED</label>
+      <div>
+        <label>Polling Interval</label>
+        <input id="app-polling-interval" name="polling-interval" type="number" min="1" inputmode="numeric" step="1" />
+      </div>
+      <div>
+        <label>Port</label>
+        <input id="app-port" name="port" type="number" min="1" max="65536" inputmode="numeric" step="1" />
+      </div>
+      <div>
+        <button id="app-start-polling" name="start-polling" class="ts-lv2">START</button>
+        <button id="app-stop-polling" name="stop-polling" class="ts-lv2 app-hide">STOP</button>
+        <label id="app-polling-status" name="polling-status">DISCONNECTED</label>
+      </div>
     </div>
   </div>
   <div id="app-window"></div>
@@ -45,6 +61,11 @@
         startId: 'app-start-polling',
         stopId: 'app-stop-polling',
         statusId: 'app-polling-status'
+      },
+      status: {
+        addedId: 'app-added-count',
+        frameId: 'app-frame-count',
+        removedId: 'app-removed-count'
       }
     });
   </script>
