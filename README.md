@@ -8,6 +8,8 @@ The project has two main parts, the web server for serving files, and the web br
 The first part is a small web server to serve the renderer files and the static dependencies locally. It's very basic and it piggy backs on the std lib's HttpServer and URLPattern objects.
 
 ## Web browser renderer
+![Image of the web renderer on its default scene](/docs/running.png)
+
 The second part is the actual web renderer that runs on the browser. It's composed of a three.js scene, a web socket that polls for new geometry at a specified interval, and a protocol between the web browser and the web socket server emitting the geometry that is used to send over basic shapes (lines, cubes, etc) with colors.
 
 The renderer polls each frame for the geometry, diffs it with the current scene, and adds/removes the primitives accordingly. Since both Bullet and PhysX all send all geometry each frame on their debug rendering interfaces, this renderer is designed around that fact.
