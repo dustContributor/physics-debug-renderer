@@ -111,6 +111,10 @@ App.views.define(() => {
     const $els = App.utils.selectors.fromIds(pars)
 
     const intervalVal = () => Number.parseInt($els.polling.interval.value)
+    const frameCountVal = () => {
+      const v = Number.parseInt($els.status.frame.innerText)
+      return Number.isNaN(v) ? 0 : v
+    }
 
     $els.polling.interval.value = 1000
     $els.polling.port.value = 10001
@@ -137,6 +141,7 @@ App.views.define(() => {
     const elmShow = (e) => e.classList.remove('app-hide')
 
     const socketMessage = (/** @type {Object.<string, PrimitiveDiff>} */ diffsById) => async (e) => {
+      let timingTstamp = performance.now()
       const arrayBuffer = await e.data.arrayBuffer()
       const buffer = new DataView(arrayBuffer)
       let processedCount = 0
@@ -150,6 +155,9 @@ App.views.define(() => {
         offset = res.offset
         processedCount += res.processed
       }
+      $els.status.decodingms.innerText = performance.now() - timingTstamp
+
+      timingTstamp = performance.now()
       const diffs = Object.values(diffsById)
       for (const diff of diffs) {
         diff.processRemoved()
@@ -172,15 +180,16 @@ App.views.define(() => {
       for (const diff of diffs) {
         diff.prepare()
       }
-      $els.status.removed.value = removedCount
-      $els.status.added.value = addedCount
-      $els.status.processed.value = processedCount
-      $els.status.current.value = debugScene.itemsInScene()
-      let frameCount = Number.parseInt($els.status.frame.value ?? 0) + 1
+      $els.status.diffingms.innerText = performance.now() - timingTstamp
+      $els.status.removed.innerText = removedCount
+      $els.status.added.innerText = addedCount
+      $els.status.processed.innerText = processedCount
+      $els.status.current.innerText = debugScene.itemsInScene()
+      let frameCount = frameCountVal() + 1
       if (frameCount > 999999) {
         frameCount = 0
       }
-      $els.status.frame.value = frameCount
+      $els.status.frame.innerText = frameCount
     }
 
     const socketOpen = (socket) => () => {
@@ -204,7 +213,7 @@ App.views.define(() => {
     const socketClose = (_) => () => {
       debugScene.reset()
       $els.polling.status.innerText = 'DISCONNECTED'
-      Object.values($els.status).forEach((e) => e.value = 0)
+      Object.values($els.status).forEach((e) => e.innerText = 0)
       elmHide($els.polling.stop)
       elmShow($els.polling.start)
     }

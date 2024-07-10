@@ -47,7 +47,7 @@
 }
 
 .app-settings>div>div>label {
-  min-width: 9em;
+  min-width: 7em;
 }
 
 .app-settings>div>div>label:first-child {
@@ -55,7 +55,7 @@
 }
 
 .app-settings>div>div>label:last-child {
-  text-align: left;
+  text-align: right;
 }
 
 .app-settings>div>div>* {
@@ -76,6 +76,10 @@
 
 .app-settings [name=start-polling] {
   background-color: #aeeeae;
+}
+
+.app-settings [name=polling-status] {
+  text-align: left!important;
 }
 
 .app-settings input {

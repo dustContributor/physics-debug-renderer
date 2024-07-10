@@ -11,9 +11,37 @@ export class HashOps {
         /** @type {number} */ start,
         /** @type {number} */ limit,
     ) {
+        const prime = this.#prime
         let hash = this.#offset
-        for (let s = start; s < limit; ++s) {
-            hash = BigInt.asIntN(64, (hash ^ BigInt(buffer.getUint8(s))) * this.#prime)
+        let i = start
+        // Hash chunks of 8 bytes
+        for (; i < limit; i += 8) {
+            if (i + 8 > limit) {
+                break
+            }
+            const v = buffer.getBigUint64(i)
+            hash = BigInt.asIntN(64, (hash ^ v) * prime)
+        }
+        if (i === limit) {
+            // 8 byte aligned, nothing else to do
+            return hash
+        }
+        // Try chunks of 4 bytes
+        for (i = i - 8; i < limit; i += 4) {
+            if (i + 4 > limit) {
+                break
+            }
+            const v = buffer.getUint32(i)
+            hash = BigInt.asIntN(64, (hash ^ v) * prime)
+        }
+        if (i === limit) {
+            // 4 byte aligned, nothing else to do
+            return hash
+        }
+        // Hash any remaining bytes individually
+        for (i = i - 4; i < limit; i++) {
+            const v = buffer.getUint8(i)
+            hash = BigInt.asIntN(64, (hash ^ v) * prime)
         }
         return hash
     }

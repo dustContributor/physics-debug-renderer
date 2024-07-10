@@ -19,23 +19,33 @@
     <div>
       <div>
         <label>Frame</label>
-        <input id="app-frame-count" name="frame" type="number" readonly="true" />
+        <label id="app-frame-count" name="frame"></label>
       </div>
       <div>
         <label>Processed</label>
-        <input id="app-processed-count" name="processed" type="number" readonly="true" />
+        <label id="app-processed-count" name="processed"></label>
       </div>
       <div>
         <label>Added</label>
-        <input id="app-added-count" name="added" type="number" readonly="true" />
+        <label id="app-added-count" name="added"></label>
       </div>
+    </div>
+    <div>
       <div>
         <label>Removed</label>
-        <input id="app-removed-count" name="removed" type="number" readonly="true" />
+        <label id="app-removed-count" name="removed"></label>
       </div>
       <div>
         <label>Current</label>
-        <input id="app-current-count" name="current" type="number" readonly="true" />
+        <label id="app-current-count" name="current"></label>
+      </div>
+      <div>
+        <label>Decoding (ms)</label>
+        <label id="app-decodingms-count" name="current"></label>
+      </div>
+      <div>
+        <label>Diffing (ms)</label>
+        <label id="app-diffingms-count" name="current"></label>
       </div>
     </div>
     <div>
@@ -76,6 +86,8 @@
         removedId: 'app-removed-count',
         processedId: 'app-processed-count',
         currentId: 'app-current-count',
+        decodingmsId: 'app-decodingms-count',
+        diffingmsId: 'app-diffingms-count',
       }
     });
   </script>
