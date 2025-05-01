@@ -155,7 +155,7 @@ App.views.define(() => {
         offset = res.offset
         processedCount += res.processed
       }
-      $els.status.decodingms.innerText = performance.now() - timingTstamp
+      $els.status.decodingms.innerText = (performance.now() - timingTstamp).toFixed(2)
 
       timingTstamp = performance.now()
       const diffs = Object.values(diffsById)
@@ -180,7 +180,7 @@ App.views.define(() => {
       for (const diff of diffs) {
         diff.prepare()
       }
-      $els.status.diffingms.innerText = performance.now() - timingTstamp
+      $els.status.diffingms.innerText = (performance.now() - timingTstamp).toFixed(2)
       $els.status.removed.innerText = removedCount
       $els.status.added.innerText = addedCount
       $els.status.processed.innerText = processedCount
