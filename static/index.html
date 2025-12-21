@@ -19,33 +19,37 @@
     <div>
       <div>
         <label>Frame</label>
-        <label id="app-frame-count" name="frame"></label>
+        <label id="app-frame-count"></label>
       </div>
       <div>
         <label>Processed</label>
-        <label id="app-processed-count" name="processed"></label>
+        <label id="app-processed-count"></label>
       </div>
       <div>
         <label>Added</label>
-        <label id="app-added-count" name="added"></label>
+        <label id="app-added-count"></label>
+      </div>
+      <div>
+        <label>Removed</label>
+        <label id="app-removed-count"></label>
       </div>
     </div>
     <div>
       <div>
-        <label>Removed</label>
-        <label id="app-removed-count" name="removed"></label>
+        <label>Current</label>
+        <label id="app-current-count"></label>
       </div>
       <div>
-        <label>Current</label>
-        <label id="app-current-count" name="current"></label>
+        <label>Size (kB)</label>
+        <label id="app-msg-size"></label>
       </div>
       <div>
         <label>Decoding (ms)</label>
-        <label id="app-decodingms-count" name="current"></label>
+        <label id="app-decodingms-count"></label>
       </div>
       <div>
         <label>Diffing (ms)</label>
-        <label id="app-diffingms-count" name="current"></label>
+        <label id="app-diffingms-count"></label>
       </div>
     </div>
     <div>
@@ -88,6 +92,7 @@
         currentId: 'app-current-count',
         decodingmsId: 'app-decodingms-count',
         diffingmsId: 'app-diffingms-count',
+        msgsizeId: 'app-msg-size'
       }
     });
   </script>

@@ -155,6 +155,7 @@ App.views.define(() => {
         offset = res.offset
         processedCount += res.processed
       }
+      $els.status.msgsize.innerText = (buffer.byteLength / 1024.0).toFixed(0)
       $els.status.decodingms.innerText = (performance.now() - timingTstamp).toFixed(2)
 
       timingTstamp = performance.now()
