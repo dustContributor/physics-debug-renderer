@@ -1,10 +1,10 @@
 // deno-lint-ignore-file no-window no-window-prefix
 import { App } from './app.js'
+import { DebugScene } from './DebugScene.js'
 import * as THREE from './deps/three.module.js'
 import * as _ from './deps/underscore-1.13.6.js'
 import { HashOps } from './HashOps.js'
-import { enums as primitiveDiffEnums, PrimitiveDiff } from './PrimitiveDiff.js'
-import { DebugScene } from './DebugScene.js'
+import { PrimitiveDiff, enums as primitiveDiffEnums } from './PrimitiveDiff.js'
 
 const enums = { ...primitiveDiffEnums }
 
@@ -85,9 +85,12 @@ App.views.define(() => {
     },
     [TRIANGLE.id]: (key, data, material) => {
       const geometry = new THREE.BufferGeometry()
-      geometry.vertices.push(new THREE.Vector3(data[0], data[1], data[2]))
-      geometry.vertices.push(new THREE.Vector3(data[3], data[4], data[5]))
-      geometry.vertices.push(new THREE.Vector3(data[6], data[7], data[8]))
+      const vertices = new Float32Array([
+        data[0], data[1], data[2],
+        data[3], data[4], data[5],
+        data[6], data[7], data[8]
+      ])
+      geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
       const obj = new THREE.Mesh(
         geometry,
         materialFor(TRIANGLE.id, material),
